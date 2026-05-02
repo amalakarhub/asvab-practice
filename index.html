@@ -144,6 +144,17 @@ html,body{
 .q-meta{display:none!important}
 .topic-select{background:#ffffff!important;color:var(--text)!important;border-color:var(--line)!important}
 .topic-select:focus{box-shadow:0 0 0 3px rgba(47,107,63,.14)!important}
+
+.top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.faq-wrap{display:grid;gap:14px;margin-top:18px}
+.faq-card{padding:18px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(248,250,246,.98),rgba(241,246,238,.98));box-shadow:0 10px 30px rgba(27,49,31,.06)}
+.faq-card h3{margin:0 0 8px;font-size:1rem;letter-spacing:-.01em;color:var(--text)}
+.faq-card p,.faq-card li{color:var(--muted);margin:.35rem 0}.faq-card ul{margin:.35rem 0 0 1.2rem;padding:0}.faq-card strong{color:var(--text)}
+.faq-callout{padding:16px;border-radius:18px;border:1px solid #c8d6c4;background:#f6faf3;color:var(--text)}
+.faq-callout p{margin:.35rem 0;color:var(--muted)}
+.faq-nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+@media(max-width:900px){.top-actions{width:100%;justify-content:flex-start}}
+
 @media print{.footer-panel{display:none!important}}
 
 </style>
@@ -276,6 +287,12 @@ function poolStatus(category){
   return {kind:'ok', text:`${pool.length} in bank`};
 }
 function buildHeader(){
+  const showFaq = state.screen !== 'faq' && state.screen !== 'test' && state.screen !== 'transition';
+  const showHome = state.screen !== 'home';
+  const actions = [
+    showFaq ? `<button class="btn secondary" onclick="renderFAQ()">FAQ</button>` : '',
+    showHome ? `<button class="btn secondary" onclick="resetToHome()">Home</button>` : ''
+  ].filter(Boolean).join('');
   return `
     <div class="topbar">
       <div class="brand">
@@ -286,11 +303,12 @@ function buildHeader(){
           <p class="subhead">ASVAB-style practice with AFQT core drills, topic review, timed rotations, pacing feedback, and after-action review.</p>
         </div>
       </div>
-      <button class="btn secondary" onclick="resetToHome()">Home</button>
+      ${actions ? `<div class="top-actions">${actions}</div>` : ''}
     </div>`;
 }
 function render(){
   if(state.screen === 'home') return renderHome();
+  if(state.screen === 'faq') return renderFAQ();
   if(state.screen === 'transition') return renderTransition();
   if(state.screen === 'test') return renderTest();
   if(state.screen === 'results') return renderResults();
@@ -306,9 +324,87 @@ function buildFooter(){
     </div>
     <div class="footer-actions">
       <p class="reset-note">Saved progress is stored only in this browser.</p>
+      <button class="btn secondary" onclick="renderFAQ()">FAQ</button>
       <button class="btn reset" onclick="clearSavedProgress()">Reset saved progress</button>
     </div>
   </footer>`;
+}
+
+
+function renderFAQ(){
+  state.screen = 'faq';
+  app.innerHTML = buildHeader() + `<div class="card panel">
+    <p class="eyebrow">Frequently Asked Questions</p>
+    <h2 style="font-size:2rem;margin:.15rem 0 .5rem">How to use this ASVAB + AFQT + ICTL trainer</h2>
+    <div class="faq-callout">
+      <strong>Independent practice tool.</strong>
+      <p>This website is not official. It is not affiliated with, endorsed by, or sponsored by the Department of Defense, MEPS, USMEPCOM, the Army, or the official ASVAB testing program.</p>
+      <p>The questions are original ASVAB-style practice questions. They are meant for study, pacing, and review, not for predicting an official score.</p>
+    </div>
+    <div class="faq-wrap">
+      <section class="faq-card">
+        <h3>What is this app?</h3>
+        <p>This is a browser-based ASVAB, AFQT, and ICTL practice trainer. It helps users practice timed rotations, focus on AFQT core areas, and drill weak topics.</p>
+      </section>
+      <section class="faq-card">
+        <h3>Is this the official ASVAB?</h3>
+        <p>No. This is an independent practice tool. The official ASVAB is administered through authorized testing channels such as MEPS, MET sites, or approved school testing programs.</p>
+      </section>
+      <section class="faq-card">
+        <h3>Are these real ASVAB questions?</h3>
+        <p>No. The question bank uses original ASVAB-style practice questions. Real operational test questions are controlled testing material and should not be copied or shared.</p>
+      </section>
+      <section class="faq-card">
+        <h3>What is AFQT?</h3>
+        <p>AFQT stands for Armed Forces Qualification Test. It is the enlistment-eligibility score calculated from four ASVAB areas:</p>
+        <ul>
+          <li>Arithmetic Reasoning</li>
+          <li>Mathematics Knowledge</li>
+          <li>Word Knowledge</li>
+          <li>Paragraph Comprehension</li>
+        </ul>
+      </section>
+      <section class="faq-card">
+        <h3>What should I practice first?</h3>
+        <p>If your first goal is enlistment eligibility, start with <strong>AFQT Core Drill</strong>. That focuses on AR, MK, WK, and PC. After that, use topic practice to repair weak areas.</p>
+      </section>
+      <section class="faq-card">
+        <h3>What is ICTL?</h3>
+        <p>ICTL is a cyber and computer-literacy style test area. It does not replace AFQT. Use it as extra practice if you are interested in cyber, signal, IT, or technical job paths.</p>
+      </section>
+      <section class="faq-card">
+        <h3>Does this app predict my real ASVAB score?</h3>
+        <p>No. It can show accuracy, pacing, weak topics, and progress trends, but it cannot reproduce the official adaptive CAT-ASVAB scoring model or guarantee a real score.</p>
+      </section>
+      <section class="faq-card">
+        <h3>Why do answer choices move around?</h3>
+        <p>Answer choices are shuffled so users learn the concept instead of memorizing that the answer was A, B, C, or D.</p>
+      </section>
+      <section class="faq-card">
+        <h3>What is timed mode?</h3>
+        <p>Timed mode is for pacing discipline. The timer warns as the deadline approaches and tracks overtime instead of stopping the test.</p>
+      </section>
+      <section class="faq-card">
+        <h3>What is Practice by Topic?</h3>
+        <p>Practice by Topic lets users drill all questions in a category or isolate one skill area, such as percent change, linear equations, context meaning, circuits, tools, or networking.</p>
+      </section>
+      <section class="faq-card">
+        <h3>Is progress saved?</h3>
+        <p>Yes. Recent session history is saved only in the user's browser using local storage. There is no login, server, database, or cloud sync.</p>
+      </section>
+      <section class="faq-card">
+        <h3>How do I reset progress?</h3>
+        <p>Use the <strong>Reset saved progress</strong> button in the footer. The app asks for confirmation before deleting saved progress.</p>
+      </section>
+      <section class="faq-card">
+        <h3>Can I use this offline?</h3>
+        <p>Yes. The app is a standalone HTML file. If you save the page locally, it can run in a browser without installing anything.</p>
+      </section>
+    </div>
+    <div class="faq-nav">
+      <button class="btn" onclick="resetToHome()">Back to Dashboard</button>
+    </div>
+  </div>`;
 }
 
 function renderHome(){
@@ -707,6 +803,7 @@ window.lockAnswer = lockAnswer;
 window.nextQuestion = nextQuestion;
 window.confirmAbort = confirmAbort;
 window.resetToHome = resetToHome;
+window.renderFAQ = renderFAQ;
 window.restartSameMode = restartSameMode;
 window.downloadReport = downloadReport;
 window.clearSavedProgress = clearSavedProgress;
